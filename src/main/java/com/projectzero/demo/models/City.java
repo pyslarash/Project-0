@@ -1,18 +1,16 @@
 package com.projectzero.demo.models;
 
 import jakarta.persistence.*;
-
-import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "cities", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"city", "country"})
-})
+@Table(name = "cities", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "country"})})
 public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "city", nullable = false, length = 255)
     private String city;
@@ -20,25 +18,23 @@ public class City {
     @Column(name = "country", nullable = false, length = 255)
     private String country;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserCity> userCities;
 
     // Constructors
     public City() {}
 
-    public City(User user, String city, String country) {
-        this.user = user;
+    public City(String city, String country) {
         this.city = city;
         this.country = country;
     }
 
-    // Getters and Setters
-    public int getId() {
+    // Getters and setters
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -58,36 +54,11 @@ public class City {
         this.country = country;
     }
 
-    public User getUser() {
-        return user;
+    public Set<UserCity> getUserCities() {
+        return userCities;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    // Equals and HashCode
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof City)) return false;
-        City city1 = (City) o;
-        return id == city1.id && Objects.equals(city, city1.city) && Objects.equals(country, city1.country);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, city, country);
-    }
-
-    // toString
-    @Override
-    public String toString() {
-        return "City{" +
-                "id=" + id +
-                ", city='" + city + '\'' +
-                ", country='" + country + '\'' +
-                ", user=" + user +
-                '}';
+    public void setUserCities(Set<UserCity> userCities) {
+        this.userCities = userCities;
     }
 }
