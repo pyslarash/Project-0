@@ -1,16 +1,22 @@
 CREATE TABLE users (
-    id int PRIMARY KEY,
-    login varchar(255),
-    email varchar(255),
-    password varchar(255),
-    type varchar(255)
+    id INT PRIMARY KEY,
+    login VARCHAR(255),
+    email VARCHAR(255),
+    password VARCHAR(255),
+    type VARCHAR(255)
 );
 
 CREATE TABLE cities (
-    id int PRIMARY KEY,
-    user_id int,
-    city varchar(255),
-    country varchar(255),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    id INT PRIMARY KEY,
+    city VARCHAR(255),
+    country VARCHAR(255),
     UNIQUE (city, country)
+);
+
+CREATE TABLE user_cities (
+    user_id INT,
+    city_id INT,
+    PRIMARY KEY (user_id, city_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
 );
