@@ -26,8 +26,14 @@ public class UserService {
     }
 
     public User saveUser(User user) {
-        return userRepo.save(user);
+        try {
+            return userRepo.save(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    // Other business logic methods
+
+
 }
