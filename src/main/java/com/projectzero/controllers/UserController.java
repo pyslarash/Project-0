@@ -19,6 +19,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/hello")
+    public ResponseEntity<String> sayHello() {
+        String message = "Hello, World!";
+        return ResponseEntity.ok(message);
+    }
+
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
