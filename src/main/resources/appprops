@@ -1,7 +1,7 @@
 spring.application.name=ProjectZero
-spring.datasource.url=jdbc:postgresql://localhost:5432/projectzero
-spring.datasource.username=postgres
-spring.datasource.password=password
+spring.datasource.url=jdbc:postgresql://localhost:5432/
+spring.datasource.username=
+spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=validate
 
 spring.jpa.show-sql=true
