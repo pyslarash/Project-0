@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello() {
-        String message = "Hello, World!";
+        String message = "Hello, World";
         return ResponseEntity.ok(message);
     }
 
