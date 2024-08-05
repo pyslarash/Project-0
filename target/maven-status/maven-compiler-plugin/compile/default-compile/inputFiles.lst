@@ -1,7 +1,9 @@
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/ProjectZeroApp.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/controllers/UserController.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/models/City.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/models/User.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/models/UserCities.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/repositories/UserRepo.java
-/Users/miguelarias/Revature/Project-0/src/main/java/com/projectzero/services/UserService.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/ProjectZeroApp.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/config/Argon2Encoder.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/config/SecurityConfig.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/controllers/UserController.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/models/City.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/models/User.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/repositories/UserRepo.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/services/UserService.java
+/home/pyslarash/Documents/it-projects/Project-0/src/main/java/com/projectzero/utils/JwtUtil.java
