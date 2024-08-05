@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     login VARCHAR(255),
     email VARCHAR(255),
     password VARCHAR(255),
@@ -7,7 +7,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE cities (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     city VARCHAR(255),
     country VARCHAR(255),
     UNIQUE (city, country)  -- Ensure uniqueness of city-country pairs
