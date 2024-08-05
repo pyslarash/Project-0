@@ -1,6 +1,12 @@
 com/projectzero/ProjectZeroApp.class
 com/projectzero/repositories/UserRepo.class
+com/projectzero/utils/JwtUtil.class
 com/projectzero/models/City.class
 com/projectzero/services/UserService.class
+<<<<<<< HEAD
+=======
+com/projectzero/config/Argon2Encoder.class
+>>>>>>> 6bb4208 (User registration and login completed)
 com/projectzero/controllers/UserController.class
 com/projectzero/models/User.class
+com/projectzero/config/SecurityConfig.class

@@ -1,4 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.projectzero.ProjectZero.ProjectZeroAppTests
 -------------------------------------------------------------------------------
+<<<<<<< HEAD
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.305 s -- in com.projectzero.ProjectZero.ProjectZeroAppTests
+=======
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.620 s -- in com.projectzero.ProjectZero.ProjectZeroAppTests
+>>>>>>> 6bb4208 (User registration and login completed)
