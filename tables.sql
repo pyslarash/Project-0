@@ -10,8 +10,8 @@ CREATE TABLE cities (
     id INT PRIMARY KEY,
     city VARCHAR(255),
     country VARCHAR(255),
-    UNIQUE (city, country)
-);
+    UNIQUE (city, country)  -- Ensure uniqueness of city-country pairs
+
 
 CREATE TABLE user_cities (
     user_id INT,
