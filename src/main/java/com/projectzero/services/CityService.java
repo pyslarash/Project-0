@@ -18,12 +18,7 @@ public class CityService {
     public CityService(CityRepo cityRepo){ this.cityRepo = cityRepo;}
 
     public City saveCity(City city){
-        try {
-            return  cityRepo.save(city);
-        } catch (Exception e){
-            e.printStackTrace();
-            throw e;
-        }
+        return  cityRepo.save(city);
     }
     public List<City> getAllCities() { return cityRepo.findAll();}
 
@@ -33,15 +28,22 @@ public class CityService {
 
     public Optional<City> patchCity(Integer id, City city){
         Optional<City> cityfound = cityRepo.findById(id);
-        if (!cityfound.isEmpty()) {
-            Optional<City> found = Optional.of(cityRepo.save(city));
-            return found;
-        }
+        if (cityfound.isPresent()){
+            City exists = cityfound.get();
+            exists.setCity(city.getCity());
+            City updated = cityRepo.save(exists);
 
-        return cityfound;
+            return Optional.of(updated);
+        }
+        return null;
+
     }
     public void deleteCityById(Integer id){
         cityRepo.deleteById(id);
+    }
+
+    public Optional<City> getCityByCity(String city){
+        return cityRepo.findByCity(city);
     }
 
 
