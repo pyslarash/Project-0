@@ -31,7 +31,7 @@ public class AuthService {
         user.setLogin(registerUserDto.getLogin());
         user.setEmail(registerUserDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
-        user.setType(registerUserDto.getType()); // Ensure type is included in DTO
+        user.setType(registerUserDto.getType());
 
         // Save the User entity
         userRepo.save(user);

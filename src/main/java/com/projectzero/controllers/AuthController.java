@@ -8,7 +8,9 @@ import com.projectzero.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.Map;
 
@@ -24,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserDto registerUserDto) {
         if (registerUserDto.getEmail() == null || registerUserDto.getEmail().isEmpty()) {
             return ResponseEntity.badRequest().body("Email cannot be null or empty");
         }
@@ -38,6 +40,20 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed");
         }
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // Iterate through the field errors and build a custom error message
+        StringBuilder errorMessage = new StringBuilder();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            if ("type".equals(error.getField())) {
+                errorMessage.append("Invalid type");
+            } else {
+                errorMessage.append(error.getDefaultMessage()).append(" ");
+            }
+        });
+        return ResponseEntity.badRequest().body(errorMessage.toString().trim());
     }
 
     @PostMapping("/login")
