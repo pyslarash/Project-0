@@ -1,13 +1,17 @@
 package com.projectzero.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.projectzero.enums.UserType;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,29 +38,30 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private UserType type;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_cities",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "city_id")
     )
-    private Set<City> cities;
+    private Set<City> cities = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Define roles based on the type of the user
-        if ("admin".equals(type)) {
+        if (UserType.ADMIN.equals(type)) {
             return List.of(
                     new SimpleGrantedAuthority("admin"),
-                    new SimpleGrantedAuthority("user") // Admins have user role as well
+                    new SimpleGrantedAuthority("user")
             );
-        } else if ("user".equals(type)) {
+        } else if (UserType.USER.equals(type)) {
             return List.of(new SimpleGrantedAuthority("user"));
         } else {
-            return List.of(); // No roles assigned for unknown types
+            return List.of();
         }
     }
 
@@ -85,6 +90,10 @@ public class User implements UserDetails {
         return true;
     }
 
+    public UserType getUserType() {
+        return type;
+    }
+
     @PrePersist
     @PreUpdate
     private void validateFields() {
@@ -97,7 +106,7 @@ public class User implements UserDetails {
         if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
-        if (type == null || type.trim().isEmpty()) {
+        if (type == null) {
             throw new IllegalArgumentException("Type cannot be null or empty");
         }
     }
