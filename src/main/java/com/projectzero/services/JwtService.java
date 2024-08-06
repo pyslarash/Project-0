@@ -22,7 +22,7 @@ public class JwtService {
     private String secretKey;
 
     @Value("${jwt.expiration}")
-    private long jwtExpiration; // Change type to long
+    private long jwtExpiration;
 
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);

@@ -1,10 +1,13 @@
 package com.projectzero.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import com.projectzero.enums.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import com.projectzero.validation.ValidUserType;
 
 @Setter
 @Getter
@@ -21,7 +24,6 @@ public class RegisterUserDto {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotEmpty(message = "Type cannot be empty")
-    private String type;
-
+    @NotNull
+    private UserType type;
 }

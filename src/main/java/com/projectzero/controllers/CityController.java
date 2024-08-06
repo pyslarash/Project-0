@@ -1,11 +1,16 @@
 package com.projectzero.controllers;
 
+import com.projectzero.dtos.CityDto;
+import com.projectzero.enums.UserType;
 import com.projectzero.models.City;
+import com.projectzero.models.User;
 import com.projectzero.services.CityService;
-import jakarta.websocket.server.PathParam;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.projectzero.repositories.CityRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,41 +19,45 @@ import java.util.Optional;
 @RequestMapping("/city")
 public class CityController {
 
-    CityService cityService;
+    private final CityService cityService;
 
     @Autowired
-    public CityController( CityService cityService){this.cityService = cityService;}
+    private CityRepo cityRepo;
+
+    @Autowired
+    public CityController(CityService cityService) {
+        this.cityService = cityService;
+    }
 
     @PostMapping("/")
-    public ResponseEntity<City> postCity(@RequestBody City city){
-        City saveCity = cityService.saveCity(city);
+    public ResponseEntity<City> postCity(@RequestBody City city, @AuthenticationPrincipal User user){
+        City saveCity = cityService.saveCity(user, city);
         return ResponseEntity.ok(saveCity);
     }
 
     @GetMapping("/")
-    public  ResponseEntity<List<City>> getCities(){
-        List<City> cities = cityService.getAllCities();
+    public ResponseEntity<List<CityDto>> getCities(@AuthenticationPrincipal User user) {
+        List<CityDto> cities = cityService.getAllCities(user);
         return ResponseEntity.ok(cities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable Integer id){
-        Optional<City> city = cityService.getCityById(id);
+    public ResponseEntity<CityDto> getCityById(@PathVariable Integer id, @AuthenticationPrincipal User user) {
+        Optional<CityDto> city = cityService.getCityById(user, id);
         return city.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @PatchMapping("/{id}")
-    public ResponseEntity<City> updateCytyById(@PathVariable Integer id,@RequestBody City city){
-        Optional<City> upCity = cityService.patchCity(id,city);
+    public ResponseEntity<City> updateCityById(@PathVariable Integer id,@RequestBody City city, @AuthenticationPrincipal User user){
+        Optional<City> upCity = cityService.patchCity(user, id, city);
         return upCity.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCity(@PathVariable Integer id){
-        cityService.deleteCityById(id);
+    public ResponseEntity<Void> deleteCity(@PathVariable Integer id, @AuthenticationPrincipal User user){
+        cityService.deleteCityById(user, id);
         return ResponseEntity.noContent().build();
     }
-
 }
