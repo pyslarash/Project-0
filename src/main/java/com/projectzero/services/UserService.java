@@ -1,6 +1,5 @@
 package com.projectzero.services;
 
-import com.projectzero.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,15 +12,15 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    UserRepo userRepo;
-    PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
     }
 
     public List<User> getAllUsers() {
@@ -41,21 +40,4 @@ public class UserService {
             throw e;
         }
     }
-
-    public String login(String login, String password) {
-        // Try to find the user by login
-        Optional<User> userOpt = userRepo.findByLogin(login);
-
-        if (userOpt.isEmpty()) {
-            return null; // User not found
-        }
-
-        User user = userOpt.get();
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            return jwtUtil.generateToken(login);
-        } else {
-            return null;
-        }
-    }
-
 }
