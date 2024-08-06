@@ -28,8 +28,12 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
-        return userRepo.findAll().stream()
+        // Fetch all users with cities eagerly loaded
+        List<User> users = userRepo.findAll();
+
+        return users.stream()
                 .map(user -> {
                     UserDto userDto = new UserDto();
                     userDto.setId(user.getId());
@@ -37,7 +41,7 @@ public class UserService {
                     userDto.setEmail(user.getEmail());
                     userDto.setCities(user.getCities().stream()
                             .map(city -> new CityDto(city.getId(), city.getCity(), city.getCountry()))
-                            .collect(Collectors.toSet()));
+                            .collect(Collectors.toSet())); // Collect cities to Set
                     return userDto;
                 })
                 .collect(Collectors.toList());
@@ -45,8 +49,8 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<UserDto> getUserById(User currentUser, Integer id) {
-        // Use the custom repository method to fetch the user and their cities eagerly
-        Optional<User> userOpt = userRepo.findByIdWithCities(id);
+        // Fetch the user with cities eagerly loaded
+        Optional<User> userOpt = userRepo.findById(id);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -59,7 +63,7 @@ public class UserService {
                 userDTO.setEmail(user.getEmail());
                 userDTO.setCities(user.getCities().stream()
                         .map(city -> new CityDto(city.getId(), city.getCity(), city.getCountry()))
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet())); // Collect cities to Set
 
                 // Log city size for debugging
                 System.out.println("User cities size: " + user.getCities().size());
@@ -70,7 +74,6 @@ public class UserService {
 
         return Optional.empty();
     }
-
 
     public User saveUser(User user) {
         try {

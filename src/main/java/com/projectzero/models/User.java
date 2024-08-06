@@ -42,13 +42,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserType type;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER) // Ensure EAGER fetch
     @JoinTable(
             name = "user_cities",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "city_id")
     )
-    private Set<City> cities = new HashSet<>();
+    private List<City> cities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

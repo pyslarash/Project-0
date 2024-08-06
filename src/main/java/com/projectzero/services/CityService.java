@@ -1,6 +1,7 @@
 package com.projectzero.services;
 
 
+import com.projectzero.dtos.CityDto;
 import com.projectzero.enums.UserType;
 import com.projectzero.models.City;
 import com.projectzero.models.User;
@@ -9,8 +10,10 @@ import com.projectzero.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.projectzero.dtos.UserDto;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CityService {
@@ -48,26 +51,62 @@ public class CityService {
     }
 
 
-    public List<City> getAllCities(User user) {
+    @Transactional(readOnly = true)
+    public List<CityDto> getAllCities(User user) {
+        List<City> cities;
         if (user.getType() == UserType.ADMIN) {
-            return cityRepo.findAll();
+            cities = cityRepo.findAll();
+        } else {
+            cities = List.copyOf(user.getCities());
         }
-        return List.copyOf(user.getCities());
+
+        return cities.stream()
+                .map(city -> {
+                    CityDto cityDto = new CityDto();
+                    cityDto.setId(city.getId());
+                    cityDto.setCity(city.getCity());
+                    cityDto.setCountry(city.getCountry());
+                    if (user.getType() == UserType.ADMIN) {
+                        cityDto.setUsers(city.getUsers().stream()
+                                .map(u -> {
+                                    UserDto userDto = new UserDto();
+                                    userDto.setId(u.getId());
+                                    userDto.setLogin(u.getLogin());
+                                    userDto.setEmail(u.getEmail());
+                                    // You may set cities here if needed
+                                    return userDto;
+                                })
+                                .collect(Collectors.toSet()));
+                    }
+                    return cityDto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Optional<City> getCityById(User user, Integer id) {
+    public Optional<CityDto> getCityById(User user, Integer id) {
         Optional<City> cityOpt = cityRepo.findById(id);
         if (cityOpt.isPresent()) {
             City city = cityOpt.get();
+            CityDto cityDto = new CityDto();
+            cityDto.setId(city.getId());
+            cityDto.setCity(city.getCity());
+            cityDto.setCountry(city.getCountry());
             if (user.getType() == UserType.ADMIN) {
-                // For admin users, load the city along with associated users
-                city.getUsers().size(); // Trigger loading of users
+                cityDto.setUsers(city.getUsers().stream()
+                        .map(u -> {
+                            UserDto userDto = new UserDto();
+                            userDto.setId(u.getId());
+                            userDto.setLogin(u.getLogin());
+                            userDto.setEmail(u.getEmail());
+                            // You may set cities here if needed
+                            return userDto;
+                        })
+                        .collect(Collectors.toSet()));
             } else {
-                // Non-admins won't get users associated with the city
-                city.setUsers(null);
+                cityDto.setUsers(null);
             }
-            return Optional.of(city);
+            return Optional.of(cityDto);
         }
         return Optional.empty();
     }

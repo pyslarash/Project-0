@@ -45,12 +45,11 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAllUsers(@AuthenticationPrincipal User currentUser) {
         // Check if the current user is an admin
         if (currentUser.getType() == UserType.ADMIN) {
-            List<UserDto> userDto = userService.getAllUsers();
-            return ResponseEntity.ok(userDto);
+            List<UserDto> userDtos = userService.getAllUsers();
+            return ResponseEntity.ok(userDtos);
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Integer id, @AuthenticationPrincipal User currentUser) {

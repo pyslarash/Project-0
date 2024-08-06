@@ -1,5 +1,6 @@
 package com.projectzero.controllers;
 
+import com.projectzero.dtos.CityDto;
 import com.projectzero.enums.UserType;
 import com.projectzero.models.City;
 import com.projectzero.models.User;
@@ -35,14 +36,14 @@ public class CityController {
     }
 
     @GetMapping("/")
-    public  ResponseEntity<List<City>> getCities(@AuthenticationPrincipal User user){
-        List<City> cities = cityService.getAllCities(user);
+    public ResponseEntity<List<CityDto>> getCities(@AuthenticationPrincipal User user) {
+        List<CityDto> cities = cityService.getAllCities(user);
         return ResponseEntity.ok(cities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable Integer id, @AuthenticationPrincipal User user) {
-        Optional<City> city = cityService.getCityById(user, id);
+    public ResponseEntity<CityDto> getCityById(@PathVariable Integer id, @AuthenticationPrincipal User user) {
+        Optional<CityDto> city = cityService.getCityById(user, id);
         return city.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

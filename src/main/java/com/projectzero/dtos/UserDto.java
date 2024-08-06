@@ -1,17 +1,23 @@
 package com.projectzero.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @Data
-@AllArgsConstructor
+@Setter
+@Getter
 @NoArgsConstructor
 public class UserDto {
     private Integer id;
     private String login;
     private String email;
     private Set<CityDto> cities;
+
+    public UserDto(Integer id, String login, String email, Set<CityDto> cities) {
+        this.id = id;
+        this.login = login;
+        this.email = email;
+        this.cities = cities;
+    }
 }

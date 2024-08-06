@@ -13,9 +13,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Integer> {
-
-    @Query("SELECT u FROM User u JOIN FETCH u.cities WHERE u.id = :id")
-    Optional<User> findByIdWithCities(@Param("id") Integer id);
-
     Optional<User> findByLogin(String login);
 }
