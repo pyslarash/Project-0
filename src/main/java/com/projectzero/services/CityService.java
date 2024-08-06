@@ -3,6 +3,7 @@ package com.projectzero.services;
 
 import com.projectzero.models.City;
 import com.projectzero.repositories.CityRepo;
+import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class CityService {
 
             return Optional.of(updated);
         }
-        return null;
+        return Optional.empty();
 
     }
     public void deleteCityById(Integer id){
