@@ -1,5 +1,6 @@
 package com.projectzero.repositories;
 
+import com.projectzero.models.City;
 import com.projectzero.models.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepo extends JpaRepository<User, Integer> {
     Optional<User> findByLogin(String login);
+    List<User> findByCitiesContains(City city);
 }

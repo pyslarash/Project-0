@@ -1,6 +1,7 @@
 package com.projectzero.controllers;
 
 import com.projectzero.dtos.CityDto;
+import com.projectzero.enums.UserType;
 import com.projectzero.models.City;
 import com.projectzero.models.User;
 import com.projectzero.services.CityService;
@@ -46,7 +47,7 @@ public class CityController {
         return ResponseEntity.ok(savedCity);
     }
 
-    @GetMapping("/{cityName}")
+    @GetMapping("/name/{cityName}")
     public ResponseEntity<CityDto> getCityByCity(@PathVariable String cityName, @AuthenticationPrincipal User user) {
         if (user == null) {
             return ResponseEntity.badRequest().build();
@@ -57,21 +58,34 @@ public class CityController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CityDto>> getCitiesForUser(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Integer userId) {
+        try {
+            List<CityDto> cities = cityService.getCitiesForUser(currentUser, userId);
+            return ResponseEntity.ok(cities);
+        } catch (SecurityException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @GetMapping("/")
-    public ResponseEntity<List<City>> getCities() {
-        List<City> cities = cityService.getAllCities();
+    public ResponseEntity<List<CityDto>> getCities(@AuthenticationPrincipal User currentUser) {
+        List<CityDto> cities = cityService.getAllCities(currentUser);
         return ResponseEntity.ok(cities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable Integer id){
-        Optional<City> city = cityService.getCityById(id);
+    public ResponseEntity<CityDto> getCityById(@PathVariable Integer id, @AuthenticationPrincipal User currentUser) {
+        Optional<CityDto> city = cityService.getCityById(currentUser, id);
         return city.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<City> updateCityById(@PathVariable Integer id, @RequestBody City city, @AuthenticationPrincipal User user) {
+    public ResponseEntity<CityDto> updateCityById(@PathVariable Integer id, @RequestBody City city, @AuthenticationPrincipal User user) {
         // Validate city input
         if (id == null || id <= 0 || city == null || city.getCity() == null || city.getCountry() == null ||
                 city.getCity().trim().isEmpty() || city.getCountry().trim().isEmpty()) {
@@ -83,10 +97,11 @@ public class CityController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<City> updatedCity = cityService.patchCity(user, id, city);
-        return updatedCity.map(ResponseEntity::ok)
+        Optional<CityDto> updatedCityDto = cityService.patchCity(user, id, city);
+        return updatedCityDto.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Integer id, @AuthenticationPrincipal User user) {

@@ -28,6 +28,8 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+
+
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         // Fetch all users with cities eagerly loaded

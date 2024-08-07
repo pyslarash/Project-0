@@ -55,14 +55,6 @@ public class CityService {
         return cityRepo.save(city);
     }
 
-    public List<City> getAllCities() {
-        return cityRepo.findAll();
-    }
-
-    public Optional<City> getCityById(Integer id){
-        return  cityRepo.findById(id);
-    }
-
     public Optional<City> patchCity(Integer id, City city) {
         Optional<City> cityfound = cityRepo.findById(id);
         if (cityfound.isPresent()) {
@@ -75,13 +67,53 @@ public class CityService {
     }
 
     @Transactional(readOnly = true)
-    public List<CityDto> getAllCities(User user) {
-        List<City> cities;
-        if (user.getType() == UserType.ADMIN) {
-            cities = cityRepo.findAll();
-        } else {
-            cities = List.copyOf(user.getCities());
+    public List<CityDto> getCitiesForUser(User currentUser, Integer userId) {
+        // Check if the current user is an admin or if they are trying to view their own cities
+        if (currentUser.getType() == UserType.ADMIN || currentUser.getId().equals(userId)) {
+            List<City> cities;
+
+            if (currentUser.getType() == UserType.ADMIN) {
+                // Admins can view all cities for the specified user
+                User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+                cities = List.copyOf(user.getCities());
+            } else {
+                // Regular users can view only their own cities
+                cities = List.copyOf(currentUser.getCities());
+            }
+
+            return cities.stream()
+                    .map(city -> {
+                        CityDto cityDto = new CityDto();
+                        cityDto.setId(city.getId());
+                        cityDto.setCity(city.getCity());
+                        cityDto.setCountry(city.getCountry());
+
+                        if (currentUser.getType() == UserType.ADMIN) {
+                            cityDto.setUsers(city.getUsers().stream()
+                                    .map(u -> {
+                                        UserDto userDto = new UserDto();
+                                        userDto.setId(u.getId());
+                                        userDto.setLogin(u.getLogin());
+                                        userDto.setEmail(u.getEmail());
+                                        return userDto;
+                                    })
+                                    .collect(Collectors.toSet()));
+                        } else {
+                            cityDto.setUsers(null);
+                        }
+
+                        return cityDto;
+                    })
+                    .collect(Collectors.toList());
         }
+
+        throw new SecurityException("Unauthorized access");
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CityDto> getAllCities(User user) {
+        List<City> cities = cityRepo.findAll(); // Fetch all cities for both admins and regular users
 
         return cities.stream()
                 .map(city -> {
@@ -89,7 +121,9 @@ public class CityService {
                     cityDto.setId(city.getId());
                     cityDto.setCity(city.getCity());
                     cityDto.setCountry(city.getCountry());
+
                     if (user.getType() == UserType.ADMIN) {
+                        // Admins get the users associated with the city
                         cityDto.setUsers(city.getUsers().stream()
                                 .map(u -> {
                                     UserDto userDto = new UserDto();
@@ -99,7 +133,11 @@ public class CityService {
                                     return userDto;
                                 })
                                 .collect(Collectors.toSet()));
+                    } else {
+                        // Regular users do not get the users associated with the city
+                        cityDto.setUsers(null);
                     }
+
                     return cityDto;
                 })
                 .collect(Collectors.toList());
@@ -132,23 +170,53 @@ public class CityService {
         return Optional.empty();
     }
 
-    public Optional<City> patchCity(User user, Integer id, City city) {
-        if (user.getType() == UserType.ADMIN || user.getCities().contains(city)) {
-            Optional<City> cityfound = cityRepo.findById(id);
-            if (cityfound.isPresent()) {
-                City existingCity = cityfound.get();
+    @Transactional
+    public Optional<CityDto> patchCity(User user, Integer id, City city) {
+        if (user.getType() == UserType.ADMIN || user.getCities().stream().anyMatch(c -> c.getId().equals(id))) {
+            Optional<City> cityOpt = cityRepo.findById(id);
+            if (cityOpt.isPresent()) {
+                City existingCity = cityOpt.get();
                 existingCity.setCity(city.getCity());
                 existingCity.setCountry(city.getCountry()); // Update other fields if necessary
-                City updated = cityRepo.save(existingCity);
-                return Optional.of(updated);
+                City updatedCity = cityRepo.save(existingCity);
+
+                // Create and return the CityDto with only required fields
+                CityDto cityDto = new CityDto();
+                cityDto.setId(updatedCity.getId());
+                cityDto.setCity(updatedCity.getCity());
+                cityDto.setCountry(updatedCity.getCountry());
+                return Optional.of(cityDto);
             }
         }
         return Optional.empty();
     }
 
+
+    @Transactional
     public void deleteCityById(User user, Integer id) {
-        Optional<City> city = cityRepo.findById(id);
-        if (city.isPresent() && (user.getType() == UserType.ADMIN || user.getCities().contains(city.get()))) {
+        Optional<City> cityOptional = cityRepo.findById(id);
+        if (cityOptional.isEmpty()) {
+            throw new IllegalStateException("City not found");
+        }
+
+        City city = cityOptional.get();
+
+        // Admins can delete any city
+        if (user.getType() == UserType.ADMIN) {
+            // Remove city from all users
+            List<User> users = userRepo.findByCitiesContains(city);
+            for (User u : users) {
+                u.getCities().remove(city);
+                userRepo.save(u); // Save user changes
+            }
+            // Delete the city
+            cityRepo.deleteById(id);
+        } else if (user.getCities().contains(city)) {
+            // Regular users can only delete cities they are associated with
+            // Remove the city from their associations
+            user.getCities().remove(city);
+            userRepo.save(user); // Save user changes
+            // Then delete the city
             cityRepo.deleteById(id);
         } else {
             throw new IllegalStateException("User not authorized to delete this city");

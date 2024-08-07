@@ -18,5 +18,5 @@ CREATE TABLE user_cities (
     city_id INT,
     PRIMARY KEY (user_id, city_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
+    FOREIGN KEY (city_id) REFERENCES cities(id)
 );
